@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Etch A Sketch</title>
+</head>
+
+<body>
+  <div class="canvasWrap">
+    <canvas width="1600" height="1000" id="sketcher"></canvas>
+    <div class="buttons">
+      <button class="shake">Shake!</button>
+    </div>
+
+  </div>
+
+  <style>
+    body {
+      min-height: 100vh;
+      display: grid;
+      align-items: center;
+      justify-items: center;
+      background: white;
+      background: url(https://s3.amazonaws.com/media.locally.net/original/HABA_ALT_2017-08-02-13-22-45.jpg);
+      background-size: cover;
+    }
+
+    canvas {
+      border: 30px solid #e80000;
+      border-radius: 10px;
+      /* Set the width and height to half the actual size so it doesn't look pixelated */
+      width: 800px;
+      height: 500px;
+      background: white;
+    }
+
+    canvas.shake {
+      animation: shake 0.5s linear 1;
+    }
+
+    @keyframes shake {
+
+      10%,
+      90% {
+        transform: translate3d(-1px, 0, 0);
+      }
+
+      20%,
+      80% {
+        transform: translate3d(2px, 0, 0);
+      }
+
+      30%,
+      50%,
+      70% {
+        transform: translate3d(-4px, 0, 0);
+      }
+
+      40%,
+      60% {
+        transform: translate3d(4px, 0, 0);
+      }
+    }
+  </style>
+ <script>
+  const canvas = document.querySelector('#sketcher');
+  const ctx = canvas.getContext('2d');
+  const shakeButton = document.querySelector('.shake');
+  const MOVE_AMOUNT = 10;
+
+  const width = canvas.width;
+  const height = canvas.height;
+
+  let x = Math.floor(Math.random() * width);
+  let y = Math.floor(Math.random() * height);
+
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.lineWidth = MOVE_AMOUNT;
+
+  let hue = 0;
+  ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`
+  ctx.beginPath(); // where to start drawing
+  ctx.moveTo(x, y);
+  ctx.lineTo(x, y);
+  ctx.stroke();
+
+  function draw({ key }) {
+    hue += MOVE_AMOUNT;  
+      
+      ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+      // ctx.strokeStyle = `hsl(${Math.random() * 360}, 100%, 50%)`
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+
+      switch (key) {
+          case 'ArrowUp':
+              y -= MOVE_AMOUNT;
+              break;
+          case 'ArrowDown':
+              y += MOVE_AMOUNT;
+              break;
+          case 'ArrowLeft':
+              x -= MOVE_AMOUNT;
+              break;
+          case 'ArrowRight':
+              x += MOVE_AMOUNT;
+              break;
+          default:
+              break;
+      }
+      ctx.lineTo(x, y);
+      ctx.stroke();
+  }
+
+  function handleKey(e) {
+      if (e.key.includes('Arrow')) {
+          e.preventDefault();
+          draw({ key: e.key });
+      }
+  }
+  function clearCanvas(){
+    canvas.classList.add('shake');
+    ctx.clearRect(0, 0, width, height); // start from 0, 0 which is top left corner and the last two coordinates are the height and width of the canvas
+    canvas.addEventListener(
+      'animationend',
+      function() {
+        console.log('done the shake');
+        canvas.classList.remove('shake');
+      },
+      {once: true}
+    )
+  }
+
+  window.addEventListener('keydown', handleKey);
+  shakeButton.addEventListener('click', clearCanvas)
+</script>
+</body>
+
+</html>
